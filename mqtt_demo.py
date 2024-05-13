@@ -1,14 +1,14 @@
 import paho.mqtt.client as mqtt
-from random import randrange, uniform
+import random 
 import time
 
 mqttBroker = "broker.mqtt-dashboard.com"
-
+relay = ["r11","r10","r21","r20","r31","r30","r41","r40"]
 client = mqtt.Client("Temperature_Inside")
 client.connect(mqttBroker)
 
 while True:
-    randNumber = uniform(20.0, 21.0)
-    client.publish("TEMPERATURE", randNumber)
-    print("Just published " + str(randNumber) + " to Topic TEMPERATURE")
+    relay1 = random.choice(relay)            
+    client.publish("TEMPERATURE", relay1)
+    print("Just published " + str(relay1) + " to Topic TEMPERATURE")
     time.sleep(1)

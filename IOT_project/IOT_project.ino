@@ -5,6 +5,11 @@
 static const char* WIFI_SSID = "Redmi";
 static const char* WIFI_PASS = "star1234";
 const char* mqtt_server = "broker.mqtt-dashboard.com";
+int relay_1 = 12;
+int relay_2 = 13;
+int relay_3 = 14;
+int relay_4 = 15;
+
 
 
 WiFiClient espClient;
@@ -29,13 +34,32 @@ void callback(char* topic, byte* payload, unsigned int length) {
   Serial.println();
 
   // Switch on the LED if an 1 was received as first character
-  if ((char)payload[0] == '1') {
-    digitalWrite(33, LOW);   // Turn the LED on (Note that LOW is the voltage level
+  if ((char)payload[0] == 'r11') {
+    digitalWrite(relay_1, HIGH);   // Turn the LED on (Note that LOW is the voltage level
     // but actually the LED is on; this is because
     // it is active low on the ESP-01)
-  } else {
-    digitalWrite(33, HIGH);  // Turn the LED off by making the voltage HIGH
+  } else if((char)payload[0] == 'r10'){
+    digitalWrite(relay_1, LOW);  // Turn the LED off by making the voltage HIGH
   }
+  else if((char)payload[0] == 'r21'){
+    digitalWrite(relay_2, HIGH);  // Turn the LED off by making the voltage HIGH
+  }
+  else if((char)payload[0] == 'r20'){
+    digitalWrite(relay_2, HIGH);  // Turn the LED off by making the voltage HIGH
+  }
+  else if((char)payload[0] == 'r31'){
+    digitalWrite(relay_3, HIGH);  // Turn the LED off by making the voltage HIGH
+  }
+  else if((char)payload[0] == 'r30'){
+    digitalWrite(relay_3, HIGH);  // Turn the LED off by making the voltage HIGH
+  }
+  else if((char)payload[0] == 'r41'){
+    digitalWrite(relay_4, HIGH);  // Turn the LED off by making the voltage HIGH
+  }
+  else if((char)payload[0] == 'r40'){
+    digitalWrite(relay_4, HIGH);  // Turn the LED off by making the voltage HIGH
+  }
+  
 
 }
 
