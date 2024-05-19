@@ -1,12 +1,15 @@
 import cv2
 import numpy as np
 import tensorflow as tf
+import urllib.request
+import time 
 
 # Load the pre-trained SSD MobileNet V2 model
 model = tf.saved_model.load('./efficientdet_d0_coco17_tpu-32/saved_model')
 
 # Function to perform person detection on a frame
 
+url = "http://192.168.211.62/640x480.jpg"
 
 def detect_person(frame):
     # Convert the frame to a format suitable for TensorFlow
@@ -38,15 +41,16 @@ def detect_person(frame):
 # Function to process the webcam stream
 
 
-def process_webcam_stream():
+def process_web_stream(url):
     # 0 for default webcam, change accordingly if you have multiple cameras
-    cap = cv2.VideoCapture(0)
+   # cap = cv2.VideoCapture()
 
     while True:
-        ret, frame = cap.read()
-        if not ret:
-            break
-
+        img_resp=urllib.request.urlopen(url)
+        imgnp=np.array(bytearray(img_resp.read()),dtype=np.uint8)
+        frame = cv2.imdecode(imgnp,-1)
+ 
+        
         # Perform person detection on the frame
         result_frame = detect_person(frame)
 
@@ -58,9 +62,9 @@ def process_webcam_stream():
             break
 
     # Release the webcam and close OpenCV windows
-    cap.release()
+    #cap.release()
     cv2.destroyAllWindows()
 
 
 # Start processing the webcam stream
-process_webcam_stream()
+process_web_stream(url)
