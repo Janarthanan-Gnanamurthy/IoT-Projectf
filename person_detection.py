@@ -52,8 +52,6 @@ def detect_person(frame):
     return frame
 
 # Function to process the webcam stream
-
-
 def process_webcam_stream():
     # 0 for default webcam, change accordingly if you have multiple cameras
     cap = cv2.VideoCapture(0)
