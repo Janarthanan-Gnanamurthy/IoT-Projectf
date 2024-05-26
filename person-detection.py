@@ -2,10 +2,17 @@ import cv2
 import numpy as np
 import tensorflow as tf
 
+# Enable memory growth for a physical GPU device
+gpus = tf.config.experimental.list_physical_devices('GPU')
+if gpus:
+    try:
+        for gpu in gpus:
+            tf.config.experimental.set_memory_growth(gpu, True)
+    except RuntimeError as e:
+        print(e)
+
 # Load the pre-trained SSD MobileNet V2 model
 model = tf.saved_model.load('./efficientdet_d0_coco17_tpu-32/saved_model')
-
-# Function to perform person detection on a frame
 
 
 def detect_person(frame):
@@ -22,16 +29,23 @@ def detect_person(frame):
     boxes = detections['detection_boxes'][0].numpy()
     scores = detections['detection_scores'][0].numpy()
     classes = detections['detection_classes'][0].numpy().astype(np.int64)
-    num_detections = detections['num_detections'][0]
+    num_detections = int(detections['num_detections'][0])
+
+    person_count = 0
 
     # Draw bounding boxes around detected persons
-    for i in range(int(num_detections)):
+    for i in range(num_detections):
         if scores[i] > threshold and classes[i] == 1:  # 1 corresponds to 'person' class
+            person_count += 1
             h, w, _ = frame.shape
             box = boxes[i] * np.array([h, w, h, w])
             box = box.astype(np.int32)
             cv2.rectangle(frame, (box[1], box[0]),
                           (box[3], box[2]), (0, 255, 0), 2)
+
+    # Display the number of detected persons on the frame
+    cv2.putText(frame, f'Persons: {person_count}', (10, 30),
+                cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
 
     return frame
 
