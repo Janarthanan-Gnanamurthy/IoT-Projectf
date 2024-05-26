@@ -1,8 +1,11 @@
 import cv2
 import numpy as np
 import tensorflow as tf
+import urllib.request
+import time 
 
 # Enable memory growth for a physical GPU device
+
 gpus = tf.config.experimental.list_physical_devices('GPU')
 if gpus:
     try:
@@ -13,7 +16,6 @@ if gpus:
 
 # Load the pre-trained SSD MobileNet V2 model
 model = tf.saved_model.load('./efficientdet_d0_coco17_tpu-32/saved_model')
-
 
 def detect_person(frame):
     # Convert the frame to a format suitable for TensorFlow
