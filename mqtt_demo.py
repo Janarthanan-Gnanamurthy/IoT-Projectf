@@ -38,14 +38,14 @@ try:
             if i < len(relay):
                 msg = relay[i] + '1'
                 relay_on.add(relay[i])
-                client.publish("PERSON_COUNT", str(msg))
+                client.publish("TEMPERATURE", str(msg))
                 print(f"Just published {msg} to Topic PERSON_COUNT")
 
         # Turn off the remaining relays
         for r in relay:
             if r not in relay_on:
                 msg = r + '0'
-                client.publish("PERSON_COUNT", str(msg))
+                client.publish("TEMPERATURE", str(msg))
                 print(f"Just published {msg} to Topic PERSON_COUNT")
 
         time.sleep(1)
