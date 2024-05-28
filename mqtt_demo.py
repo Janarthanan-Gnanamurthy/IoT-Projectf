@@ -5,7 +5,7 @@ import numpy as np
 import requests
 from person_detection import detect_person
 
-mqttBroker = "broker.mqtt-dashboard.com"
+mqttBroker = "broker.hivemq.com"
 relay = ["r1", "r2", "r3", "r4"]
 
 # Initialize MQTT client
@@ -31,23 +31,12 @@ try:
         print("Person count:", person_count)
 
         # Keep track of relays that should be on
-        relay_on = set()
         
-        # Turn on relays for detected persons
-        for i in range(person_count):
-            if i < len(relay):
-                msg = relay[i] + '1'
-                relay_on.add(relay[i])
-                client.publish("TEMPERATURE", str(msg))
-                print(f"Just published {msg} to Topic PERSON_COUNT")
+        client.publish("COUNT", str(person_count))
+        print(f"Just published {person_count} to Topic PERSON_COUNT")
 
         # Turn off the remaining relays
-        for r in relay:
-            if r not in relay_on:
-                msg = r + '0'
-                client.publish("TEMPERATURE", str(msg))
-                print(f"Just published {msg} to Topic PERSON_COUNT")
-
+        #
         time.sleep(1)
 
 except KeyboardInterrupt:
