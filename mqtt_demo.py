@@ -1,35 +1,48 @@
 import paho.mqtt.client as mqtt
-import random
 import time
 import cv2
+import numpy as np
+import requests
 from person_detection import detect_person
 
-mqttBroker = "broker.mqtt-dashboard.com"
-relay = ["r11", "r10", "r21", "r20", "r31", "r30", "r41", "r40"]
+mqttBroker = "broker.hivemq.com"
+relay = ["r1", "r2", "r3", "r4"]
+
+# Initialize MQTT client
 client = mqtt.Client("Temperature_Inside")
 client.connect(mqttBroker)
 
-# 0 for default webcam, change accordingly if you have multiple cameras
-cap = cv2.VideoCapture(0)
+# URL for the image capture
+image_url = "http://192.168.128.62/1280x720.jpg"
 
-while True:
-    ret, frame = cap.read()
-    if not ret:
-        break
+try:
+    while True:
+        # Fetch the image from the URL
+        response = requests.get(image_url)
+        image_data = np.frombuffer(response.content, np.uint8)
+        frame = cv2.imdecode(image_data, cv2.IMREAD_COLOR)
 
-    # Detect persons in the frame and get the count
-    person_count = detect_person(frame)
-    print(person_count)
-    # # Publish the person count to the MQTT broker
-    # client.publish("PERSON_COUNT", str(person_count))
-    # print(f"Just published {person_count} to Topic PERSON_COUNT")
+        if frame is None:
+            print("Failed to decode the image")
+            continue
 
-    # # Publish a random relay value
-    # relay1 = random.choice(relay)
-    # client.publish("TEMPERATURE", relay1)
-    # print(f"Just published {relay1} to Topic TEMPERATURE")
+        # Detect persons in the frame and get the count
+        person_count = detect_person(frame)
+        print("Person count:", person_count)
 
-    time.sleep(1)
+        # Keep track of relays that should be on
+        
+        client.publish("COUNT", str(person_count))
+        print(f"Just published {person_count} to Topic PERSON_COUNT")
 
-cap.release()
-cv2.destroyAllWindows()
+        # Turn off the remaining relays
+        #
+        time.sleep(1)
+
+except KeyboardInterrupt:
+    print("Interrupted by user")
+
+finally:
+    # Clean up
+    client.disconnect()
+    print("Cleaned up resources")
