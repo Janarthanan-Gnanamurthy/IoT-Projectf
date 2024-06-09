@@ -5,7 +5,7 @@ import numpy as np
 import requests
 from person_detection import detect_person
 
-mqttBroker = "broker.hivemq.com"
+mqttBroker = "test.mosquitto.org"
 relay = ["r1", "r2", "r3", "r4"]
 
 # Initialize MQTT client
@@ -13,7 +13,7 @@ client = mqtt.Client("Temperature_Inside")
 client.connect(mqttBroker)
 
 # URL for the image capture
-image_url = "http://192.168.128.62/1280x720.jpg"
+image_url = "http://192.168.250.62/1280x720.jpg"
 
 try:
     while True:
@@ -26,17 +26,21 @@ try:
             print("Failed to decode the image")
             continue
 
-        # Detect persons in the frame and get the count
-        person_count = detect_person(frame)
+        # Detect persons in the frame and get the count and the frame with detections
+        person_count, frame_with_detections = detect_person(frame)
         print("Person count:", person_count)
 
-        # Keep track of relays that should be on
-        
+        # Display the frame with detections
+        cv2.imshow('Person Detection', frame_with_detections)
+
+        # Publish the person count to the MQTT topic
         client.publish("COUNT", str(person_count))
         print(f"Just published {person_count} to Topic PERSON_COUNT")
 
-        # Turn off the remaining relays
-        #
+        # Break the loop on 'q' key press
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            break
+
         time.sleep(1)
 
 except KeyboardInterrupt:
@@ -45,4 +49,5 @@ except KeyboardInterrupt:
 finally:
     # Clean up
     client.disconnect()
+    cv2.destroyAllWindows()
     print("Cleaned up resources")

@@ -3,6 +3,7 @@ import cv2
 import numpy as np
 import tensorflow as tf
 
+# Enable GPU growth to avoid memory issues
 gpus = tf.config.experimental.list_physical_devices('GPU')
 if gpus:
     try:
@@ -11,6 +12,7 @@ if gpus:
     except RuntimeError as e:
         print(e)
 
+# Load the pre-trained model
 model = tf.saved_model.load('./efficientdet_d0_coco17_tpu-32/saved_model')
 
 
@@ -35,4 +37,21 @@ def detect_person(frame):
         if scores[i] > threshold and classes[i] == 1:  # 1 corresponds to 'person' class
             person_count += 1
 
-    return person_count
+            # Get bounding box coordinates
+            box = boxes[i]
+            (startY, startX, endY, endX) = box
+
+            # Convert normalized coordinates to pixel values
+            (h, w) = frame.shape[:2]
+            startX = int(startX * w)
+            startY = int(startY * h)
+            endX = int(endX * w)
+            endY = int(endY * h)
+
+            # Draw bounding box
+            cv2.rectangle(frame, (startX, startY),
+                          (endX, endY), (0, 255, 0), 2)
+            cv2.putText(frame, f'Person: {scores[i]:.2f}', (
+                startX, startY - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
+
+    return person_count, frame
