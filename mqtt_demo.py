@@ -34,7 +34,7 @@ try:
         cv2.imshow('Person Detection', frame_with_detections)
 
         # Publish the person count to the MQTT topic
-        client.publish("COUNT", str(person_count))
+        client.publish("PERSON_COUNT", str(person_count))
         print(f"Just published {person_count} to Topic PERSON_COUNT")
 
         # Break the loop on 'q' key press
