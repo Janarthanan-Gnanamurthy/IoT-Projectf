@@ -13,7 +13,6 @@ app = Flask(__name__)
 CORS(app)
 socketio = SocketIO(app, cors_allowed_origins="*")
 
-# Load the model
 model = tf.saved_model.load('./efficientdet_d0_coco17_tpu-32/saved_model')
 
 # Initialize MQTT client
@@ -66,7 +65,7 @@ def handle_connect():
         sample_image = cv2.imread('sample_image.jpg')
         person_count = detect_person(sample_image)
         socketio.emit('person_count', {'count': person_count})
-        # socketio.start_background_task(send_person_count)
+        # socketio.start_background_task(send_person_count
         send_person_count()
     except Exception as e:
         print(f'Error in handle_connect: {e}')
